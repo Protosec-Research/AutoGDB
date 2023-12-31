@@ -46,7 +46,7 @@ def send_response(response, command):
         rs = requests.post(f"http://{SERVER}/see-callback/", json=json_payload)
         # print(json_payload)
         if rs.status_code == 200:
-            print("Response sent successfully.")
+            print("[*] Response sent successfully.")
         else:
             print(f'Send_response failed, check for server connection please: {rs.status_code}')
     except Exception as e:
@@ -70,9 +70,18 @@ class ReverseShellCommand(gdb.Command):
                     instruction = data.get('instruction')
 
                     if instruction:
-                        print(f"Executing instruction from server: {instruction}")
-                        responses = gdb.execute(instruction,to_string=True)
-                        send_response(response=responses,command=instruction)
+                        print(f"[*] Executing instruction from server: {instruction}")
+                        try:
+                            # Attempt to execute the instruction and capture the output.
+                            responses = gdb.execute(instruction, to_string=True)
+                            print(responses)
+                            send_response(response=responses, command=instruction)
+                        except gdb.error as e:
+                            error_message = str(e)
+                            error_message = f"[!] An error occurred: {error_message}"
+                            print(error_message)
+                            send_response(response=error_message, command=instruction, success=False)
+
                 else:
                     if response.status_code == 404:
                         pass

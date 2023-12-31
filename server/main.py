@@ -40,10 +40,27 @@ async def get_instruction():
 async def read_form(request: Request):
     return templates.TemplateResponse("form.html", {"request": request})
 
+import re
+
+def remove_ansi_escape_sequences(text):
+    # ANSI 转义序列的正则表达式模式
+    ansi_escape_pattern = re.compile(r'''
+        \x1B  # ESC
+        (?:   # 7-bit C1 Fe (except CSI)
+            [@-Z\\-_]
+        |     # or [ for CSI, followed by a control sequence
+            \[
+            [0-?]*  # Parameter bytes
+            [ -/]*  # Intermediate bytes
+            [@-~]   # Final byte
+        )
+    ''', re.VERBOSE)
+    return ansi_escape_pattern.sub('', text)
+
 @app.post("/see-callback/")
 async def see_callback(request: Request):
     item = await request.json()
-    results_dict[item['instruction']] = decode_response(item['response'])
+    results_dict[item['instruction']] = remove_ansi_escape_sequences(decode_response(item['response']))
     return {"message": "Response received successfully"}
 
 import httpx
@@ -61,7 +78,7 @@ async def add_instruction(instruction: str):
 
 async def await_callback(instruction: str):
     while instruction not in results_dict:
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)
     return results_dict.pop(instruction)
 
 @app.post("/instruct/")
