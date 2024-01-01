@@ -34,8 +34,8 @@ async def get_instruction():
         return {"instruction": instruction}
     else:
         # If the queue is empty, return an empty instruction
-        # raise HTTPException(status_code=404, detail="No instruction available.")
-        return {"instruction": 'No current instruction'}
+        raise HTTPException(status_code=404, detail="No instruction available.")
+        # return {"instruction": 'No current instruction'}
     
 @app.get("/", response_class=HTMLResponse)
 async def read_form(request: Request):
@@ -58,6 +58,10 @@ def remove_ansi_escape_sequences(text):
     ''', re.VERBOSE)
     return ansi_escape_pattern.sub('', text)
 
+@app.get("/test-connection/")
+async def see_callback():
+    return {"message": "success"}
+
 @app.post("/see-callback/")
 async def see_callback(request: Request):
     item = await request.json()
@@ -75,7 +79,7 @@ import asyncio
 results_dict = {}
 
 async def add_instruction(instruction: str):
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(trust_env=False) as client:
         response = await client.get(f"{SERVER}/add-instruction/?instruction={instruction}")
         if response.status_code == 200:
             print(f"Instruction '{instruction}' added successfully.")
