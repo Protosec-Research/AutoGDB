@@ -12,17 +12,23 @@ from instruct_gdb import Gdbgpt
 
 
 llm = OpenAI(temperature=0.5,
-             openai_api_base="https://ai-yyds.com/v1",
-             openai_api_key="sk-5tzrrbESxAWLDppg39B7DaF0F5B94b69A47e570d3e930804"
-             )
+            model_name='gpt-4-1106-preview',
+            openai_api_base="https://ai-yyds.com/v1",
+            openai_api_key="sk-5tzrrbESxAWLDppg39B7DaF0F5B94b69A47e570d3e930804"
+            )
 
 prompt = PromptTemplate(
     input_variables=[],
-    template="Answer the following questions as best you can."
+    template="""\
+    You are a serious CTF player who don't make reckless decision. \
+    * Use continue, but never use run \
+    * You are inside of gdb (in pwndbg version) \
+    * The file is currently loaded, and paused in a certain frame
+    """
 )
 
 # Load the tool configs that are needed.
-llm_weather_chain = LLMChain(
+llm_gdb_chain = LLMChain(
     llm=llm,
     prompt=prompt,
     verbose=True
@@ -40,4 +46,4 @@ agent = initialize_agent(
     verbose=True
 )
 
-agent.run("You are a serious CTF player who don't make reckless decision. Exploit this file")
+agent.run("Seek way to exploit this file, Generate the final payload")

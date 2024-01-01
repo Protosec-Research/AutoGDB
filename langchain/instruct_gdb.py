@@ -24,5 +24,5 @@ def gdb_run(command: str = None) -> str:
 Gdbgpt = Tool(
     name="gdb",
     func=gdb_run,
-    description="run gdb commands on this binary file on this specific frame in gdb, given arguments: command(gdb or pwndbg command)"
+    description="run gdb commands on this binary file on this specific frame in gdb, given arguments: command(only accept gdb in pwndbg version command)"
 )

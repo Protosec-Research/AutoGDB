@@ -34,7 +34,8 @@ async def get_instruction():
         return {"instruction": instruction}
     else:
         # If the queue is empty, return an empty instruction
-        raise HTTPException(status_code=404, detail="No instruction available.")
+        # raise HTTPException(status_code=404, detail="No instruction available.")
+        return {"instruction": 'No current instruction'}
     
 @app.get("/", response_class=HTMLResponse)
 async def read_form(request: Request):
@@ -60,6 +61,11 @@ def remove_ansi_escape_sequences(text):
 @app.post("/see-callback/")
 async def see_callback(request: Request):
     item = await request.json()
+    res = remove_ansi_escape_sequences(decode_response(item['response']))
+    if len(res) > 2040:
+        notion = "Since the respone is too long, only first 2040 is noted."
+        results_dict[item['instruction']] = notion + res[:(2040-len(notion))]
+        return {"message": "Response received successfully, but too long"}
     results_dict[item['instruction']] = remove_ansi_escape_sequences(decode_response(item['response']))
     return {"message": "Response received successfully"}
 
