@@ -18,7 +18,6 @@ def encode_response(text):
     return base64_bytes.decode('utf-8')
 
 class Logger:
-    # 成功消息的颜色设置
     def __init__(self) -> None:
         self.SUCCESS_PREFIX = "\033[92m[*]\033[0m"
         self.SUCCESS_TEXT_COLOR = "\033[94m"
@@ -63,7 +62,7 @@ class GdbGptCommand(gdb.Command):
     "Fetch and execute commands from a remote server"
 
     def __init__(self):
-        super(GdbGptCommand, self).__init__("gdbgpt", gdb.COMMAND_USER)
+        super(GdbGptCommand, self).__init__("autogdb", gdb.COMMAND_USER)
         self.server = None
         self.port = None
 
@@ -86,10 +85,10 @@ class GdbGptCommand(gdb.Command):
                 self.server, self.port = args
                 self.test_connection()
             else:
-                lo.info("Usage: gdbgpt <server> <port>")
+                lo.info("Usage: autogdb <server> <port>")
                 return
         else:
-            lo.info("Usage: gdbgpt <server> <port>\nNo server and port provided.")
+            lo.info("Usage: autogdb <server> <port>\nNo server and port provided.")
             return
 
         server_url = f"http://{self.server}:{self.port}"

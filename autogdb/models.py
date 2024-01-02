@@ -8,7 +8,7 @@ import httpx
 import asyncio
 
 
-class GdbGpt:
+class AutoGDB:
 
     def __init__(self,server: str,port: str) -> None:
         """
@@ -47,7 +47,7 @@ class GdbGpt:
 
 class PwnAgent:
     
-    def __init__(self,api_key: str,api_base: str,gdbgpt: Tool) -> None:
+    def __init__(self,api_key: str,api_base: str,autogdb: Tool) -> None:
 
         from langchain.agents import initialize_agent
         from langchain.llms import OpenAI
@@ -55,7 +55,7 @@ class PwnAgent:
         from langchain.prompts import PromptTemplate
         from langchain.memory import ConversationBufferMemory
 
-        self.gdbgpt = gdbgpt
+        self.autogdb = autogdb
         self.llm = OpenAI(temperature=0.5,
             model_name='gpt-4-1106-preview',
             openai_api_base=api_base,
@@ -89,7 +89,7 @@ class PwnAgent:
 
         self.agent = initialize_agent(
             agent="zero-shot-react-description",
-            tools=[self.gdbgpt],
+            tools=[self.autogdb],
             llm=self.llm,
             verbose=True,
         )

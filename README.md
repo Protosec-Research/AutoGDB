@@ -27,7 +27,7 @@ echo "/YOUR/PATH/TO/autogdb/plugin/gpt.py" >> ~/.gdbinit
 
 In you `gdb` or `pwndbg`, You can run:
 ```shell
-pwndbg> gdbgpt <YOUR_SERVER_IP> <YOUR_SERVER_PORT>
+pwndbg> autogdb <YOUR_SERVER_IP> <YOUR_SERVER_PORT>
 ```
 * `YOUR_SERVER_IP` : Your ip for the backend server
 * `YOUR_SERVER_PORT` : Port for this server
