@@ -44,7 +44,6 @@ async def read_form(request: Request):
 import re
 
 def remove_ansi_escape_sequences(text):
-    # ANSI 转义序列的正则表达式模式
     ansi_escape_pattern = re.compile(r'''
         \x1B  # ESC
         (?:   # 7-bit C1 Fe (except CSI)
