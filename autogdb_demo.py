@@ -8,7 +8,7 @@ This demo showcases how to use the "gdbgpt" package to connect ChatGPT with GDB 
 """
 
 # Import all necessary modules from the gdbgpt package.
-from gdbgpt import GdbGpt, PwnAgent
+from autogdb import GdbGpt, PwnAgent
 
 # Import API keys from a secure location.
 # Make sure to create an api_key.py file with your personal OPENAI_API_KEY and OPENAI_API_BASE variables.
