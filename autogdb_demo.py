@@ -31,6 +31,6 @@ if __name__ == "__main__":
     # Step 3: Start interacting with the PwnAgent
     # Now, you can give commands to the PwnAgent to perform debugging tasks!!!!
     response = pwnagent.chat("Find what this code does")
-    
+    print(response)
 
 # This demo is now complete! You can expand upon it by adding more functionality or creating more complex interactions.

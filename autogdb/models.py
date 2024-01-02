@@ -6,7 +6,10 @@
 from langchain.agents import Tool
 import httpx
 import asyncio
-
+from langchain.agents import initialize_agent
+from langchain.chat_models.openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferMemory
 
 class AutoGDB:
 
@@ -40,7 +43,7 @@ class AutoGDB:
         return Tool(
         name="gdb",
         func=self.gdb_run,
-        description="run gdb commands on this binary file on this specific frame in gdb, given arguments: command(only accept gdb in pwndbg version command)"
+        description="Run gdb commands on this binary file on this specific frame in gdb, given arguments: command(only accept gdb in pwndbg version command)"
     )
 
 
@@ -48,19 +51,12 @@ class AutoGDB:
 class PwnAgent:
     
     def __init__(self,api_key: str,api_base: str,autogdb: Tool) -> None:
-
-        from langchain.agents import initialize_agent
-        from langchain.llms import OpenAI
-        from langchain import LLMChain
-        from langchain.prompts import PromptTemplate
-        from langchain.memory import ConversationBufferMemory
-
         self.autogdb = autogdb
-        self.llm = OpenAI(temperature=0.5,
+        self.llm = ChatOpenAI(temperature=0.5,
             model_name='gpt-4-1106-preview',
             openai_api_base=api_base,
             openai_api_key=api_key,
-            streaming=True
+            streaming=True,
             )
         
         self.prompt = PromptTemplate(
@@ -81,12 +77,6 @@ class PwnAgent:
 
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-        self.llm_gdb_chain = LLMChain(
-            llm=self.llm,
-            prompt=self.prompt,
-            verbose=True
-        )
-
         self.agent = initialize_agent(
             agent="zero-shot-react-description",
             tools=[self.autogdb],
@@ -95,4 +85,42 @@ class PwnAgent:
         )
 
     def chat(self,input):
-        self.agent.run(input)
+        return self.agent.run(input)
+    from langchain.callbacks.streaming_stdout_final_only import (
+    FinalStreamingStdOutCallbackHandler,
+)
+
+    
+class ChatAgent:
+
+    def __init__(self, api_key: str, api_base: str, pwnagent: PwnAgent) -> None:
+        from langchain.agents import Tool
+        from langchain.memory import ConversationBufferMemory
+        from langchain.agents import initialize_agent
+        from .streaming import FinalStreamingStdOutCallbackHandler
+
+        self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+        self.llm = ChatOpenAI(
+            temperature=0.5,
+            model_name='gpt-4-1106-preview',
+            streaming=True,
+            callbacks=[FinalStreamingStdOutCallbackHandler()]
+            )
+        
+        self.tool = Tool(
+            name="GDB Agent",
+            func=pwnagent.chat,
+            description="Assign a job for your GDB Agent to do (For example: Find vulnerability in this binary)"
+        )
+
+        self.chat_conversation_agent = initialize_agent(
+            agent="chat-conversational-react-description",
+            tools=[self.tool],
+            llm=self.llm,
+            verbose=False,
+            max_iterations=3,
+            memory=self.memory
+        )
+
+    def chat_and_assign(self,input):
+        return self.chat_conversation_agent.run(input)
