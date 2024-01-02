@@ -1,8 +1,9 @@
 # AutoGDB
 
 ## What is this?
-GDB <3 GPT
-![image](https://github.com/retr0reg/AutoGDB/assets/72267897/e97d28ca-53af-44ea-9eb0-9e797d13f003)
+## GDB <3 GPT
+![AUTOGDB](https://github.com/retr0reg/AutoGDB/assets/72267897/560a6cc0-86a4-49fe-ba8b-11f31bc0d4f5)
+
 This is a project that focused on combining the power of ChatGPT on reverse-engineering, binary-exploition jobs. This includes
 
 * `/plugin` **the plugin that your gdb needs to connect to your server**
