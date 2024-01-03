@@ -86,9 +86,6 @@ class PwnAgent:
 
     def chat(self,input):
         return self.agent.run(input)
-    from langchain.callbacks.streaming_stdout_final_only import (
-    FinalStreamingStdOutCallbackHandler,
-)
 
     
 class ChatAgent:
