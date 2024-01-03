@@ -77,7 +77,7 @@ class FinalStreamingStdOutCallbackHandler(StreamingStdOutCallbackHandler):
         if "}" in token:
             self.end_marker_reached = True
             return  # Stop execution and do not output the '}' token
-        
+
 
         if self.end_marker_reached:
             return

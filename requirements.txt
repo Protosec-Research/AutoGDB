@@ -1,1 +1,7 @@
-streamlit
+enrich==1.2.7
+fastapi==0.108.0
+httpx==0.26.0
+langchain==0.0.353
+requests==2.28.2
+rich==13.7.0
+uvicorn==0.25.0

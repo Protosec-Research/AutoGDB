@@ -16,6 +16,23 @@ CACHE_FILE_PATH = '.server_cache.auotogpt.json'
 
 lo = Logger()
 
+def banner():
+    banner = """\
+    \n\n
+         █████╗ ██╗   ██╗████████╗ ██████╗   ██████╗ ██████╗ ██████╗ 
+        ██╔══██╗██║   ██║╚══██╔══╝██╔═══██╗ ██╔════╝ ██╔══██╗██╔══██╗
+        ███████║██║   ██║   ██║   ██║   ██║ ██║  ███╗██║  ██║██████╔╝
+        ██╔══██║██║   ██║   ██║   ██║   ██║ ██║   ██║██║  ██║██╔══██╗
+        ██║  ██║╚██████╔╝   ██║   ╚██████╔╝ ╚██████╔╝██████╔╝██████╔╝
+        ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝   ╚═════╝ ╚═════╝ ╚═════╝  """
+    
+    author = """\
+        [bold red]>[/bold red] Author [bold blue]Retr0Reg[/bold blue], ChatWithBinary Team.       
+    """
+    print(banner)
+    print(author)
+    print('\n\n')
+
 def check_for_keys():
     try:
         from api_key import OPENAI_API_KEY, OPENAI_API_BASE
@@ -78,10 +95,11 @@ def setup():
 def cli():
     chatagent = setup()
     while True:
-        print(f"\n[bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]>>> ",end='')
+        print(f"\n  [bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]>>> ",end='')
         text_query = input()
-        print(f"\n[bold medium_purple1]:snowboarder: GDBAgent[/bold medium_purple1]: ", end='')
+        print(f"\n  [bold medium_purple1]:snowboarder: GDBAgent[/bold medium_purple1]: ", end='')
         chatagent.chat_and_assign(text_query)
 
 if __name__ == "__main__":
+    banner()
     cli()
