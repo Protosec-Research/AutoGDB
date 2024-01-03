@@ -25,11 +25,12 @@ def banner():
          ) /    |_(_(_(__(_)/     / )  _/___ /_ ) / ____)  
         (_/                (____ /   (_/___ /  (_/ ("""
     
-    author = """\
+    author = """\n\
+        Enable GPT in your reversing job.
         [bold red]>[/bold red] Author [bold blue]Retr0Reg[/bold blue], ChatWithBinary Team.       
     """
-    print(banner)
-    print(author)
+    print(banner,end='')
+    print(author,end='')
     print('\n')
 
 def check_for_keys():
@@ -94,8 +95,7 @@ def setup():
 def cli():
     chatagent = setup()
     while True:
-        print(f"\n  [bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]>>> ",end='')
-        text_query = input()
+        text_query = console_input(f"\n  [bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]>>> ")
         print(f"  [bold medium_purple1]:snowboarder: GDBAgent[/bold medium_purple1]: ", end='')
         chatagent.chat_and_assign(text_query)
 
