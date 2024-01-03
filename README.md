@@ -35,6 +35,8 @@ pwndbg> autogdb <YOUR_SERVER_IP> <YOUR_SERVER_PORT>
 ## ChatGPT with gdb
 Checkout our wonderful and written-with-heart `autogdb_demo.py`, it explain everything! run it by Run it by `python3 autogpt_demo.py`
 
+**In gdb, make sure to first run the program and Ctrl-C to stop, then enters the autogdb command**
+
 here's one wonderful example of analysis made by **GPT4, OpenAI**
 ```python
 > Entering new AgentExecutor chain...

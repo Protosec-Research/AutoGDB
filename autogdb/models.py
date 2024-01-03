@@ -10,7 +10,7 @@ from langchain.agents import initialize_agent
 from langchain.chat_models.openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
-
+from langchain.schema import SystemMessage
 class AutoGDB:
 
     def __init__(self,server: str,port: str) -> None:
@@ -52,25 +52,24 @@ class PwnAgent:
     
     def __init__(self,api_key: str,api_base: str,autogdb: Tool) -> None:
         self.autogdb = autogdb
-        self.llm = ChatOpenAI(temperature=0.5,
+        self.llm = ChatOpenAI(temperature=1,
             model_name='gpt-4-1106-preview',
             openai_api_base=api_base,
             openai_api_key=api_key,
             streaming=True,
             )
         
-        self.prompt = """\
+        self.template = """\
             You are a serious CTF player who don't make reckless decision. You can use gdb\
-            * When Users ask about a binary, they meant the binary inside the gdb. \
+            * Process-based analysis and dynamic analysis is recommanded.\
             * Use \'continue\', but never use \'run\' \
-            * When doing analysis on a binary, make sure to make judgement base on code, for example, only based on checksec isn't acceptable. \
-            * When reporting a vulnerability, make sure to report Where is the vuln; payload to exploit this vulnerability. \
-            * You are inside of gdb (in pwndbg version) \
             * Keep using gdb if you want until you solve the problem throughly \
-            * The file is currently loaded, and paused in a certain frame\
             * You can use commands like stack, heap, that is built in pwndbg version of gdb\
-            * When you use command \'run\', the user will help you Ctrl+C the program manuly.\
+            * When you use command \'run\', the user will help you Ctrl+C the program manuly.\\n\n
+            * Try to use less of functions like \'info functions\', since it generate long response and you cant retrieve all of it\
             """
+        
+        self.sysmessage = SystemMessage(content=self.template)
 
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
@@ -79,12 +78,13 @@ class PwnAgent:
             tools=[self.autogdb],
             llm=self.llm,
             verbose=True,
+            agent_kwargs={
+                'system_message': self.template,
+            }
         )
-        
-        self.agent.llm_chain.prompt.template = self.prompt
 
     def chat(self,input):
-        return self.agent.run(input)
+        return self.agent.run(self.template+input)
 
     
 class ChatAgent:
@@ -111,13 +111,26 @@ class ChatAgent:
             description="Assign a job for your GDB Agent to do (For example: Find vulnerability in this binary)"
         )
 
+        self.template = """\
+            You are a Reverse-engineering assistance call autoGDB, who have the ability call other assistance who have ability to use gdb.
+            Your user may ask you to analysis some binary file, they meant the binary file that you \"Gdb assistance\" is dynamic-debugging.
+            Your \"Gdb assistance\" have the ability to analysis and deduct the task you send and dynamic-debug it in gdb (with pwndbg installed) in vert-thought steps.
+            Feel free to ask for you \"Gdb assistance\" and they will return the final answer to your task or problem to them
+            Meanwhile, you are vert smart, you can find connections and do deduction with information you have.
+            """
+        
+        self.sysmessage = SystemMessage(content=self.template)
+
         self.chat_conversation_agent = initialize_agent(
             agent="chat-conversational-react-description",
             tools=[self.tool],
             llm=self.llm,
             verbose=False,
             max_iterations=3,
-            memory=self.memory
+            memory=self.memory,
+            agent_kwargs={
+                'system_message': self.template,
+            }
         )
 
     def chat_and_assign(self,input):

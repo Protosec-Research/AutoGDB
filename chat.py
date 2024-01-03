@@ -4,6 +4,8 @@ import os
 
 from rich import print
 from rich.progress import Progress
+import readline
+
 
 import warnings
 
