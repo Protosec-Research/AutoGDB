@@ -59,9 +59,7 @@ class PwnAgent:
             streaming=True,
             )
         
-        self.prompt = PromptTemplate(
-            input_variables=[],
-            template="""\
+        self.prompt = """\
             You are a serious CTF player who don't make reckless decision. You can use gdb\
             * When Users ask about a binary, they meant the binary inside the gdb. \
             * Use \'continue\', but never use \'run\' \
@@ -73,7 +71,6 @@ class PwnAgent:
             * You can use commands like stack, heap, that is built in pwndbg version of gdb\
             * When you use command \'run\', the user will help you Ctrl+C the program manuly.\
             """
-        )
 
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
@@ -83,6 +80,8 @@ class PwnAgent:
             llm=self.llm,
             verbose=True,
         )
+        
+        self.agent.llm_chain.prompt.template = self.prompt
 
     def chat(self,input):
         return self.agent.run(input)
