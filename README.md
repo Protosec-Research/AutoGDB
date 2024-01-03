@@ -1,6 +1,11 @@
 # AutoGDB
-
-![AUTOGDB](https://github.com/retr0reg/AutoGDB/assets/72267897/560a6cc0-86a4-49fe-ba8b-11f31bc0d4f5)
+![AUTOGDB](imgs/AUTOGDB.png)
+<p align="center">
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blueviolet.svg"></a>
+<a href="https://github.com/retr0reg/AutoGDB/issues"><img src="https://img.shields.io/github/issues/retr0reg/AutoGDB?color=blueviolet"></a>
+<a href="https://www.python.org/"><img src="https://img.shields.io/badge/made%20with-Python3-blueviolet"></a>
+<a href="#"><img src="https://img.shields.io/badge/platform-osx%2Flinux%2Fwindows-blueviolet"></a>
+</p>
 
 AutoGDB that focused on combining the power of ChatGPT on reverse-engineering, binary-exploition jobs. 
 This project includes:
@@ -44,7 +49,7 @@ Run `chat.py`, chat with you own AutoGDB!
 python3 chat.py
 ```
 
-![Alt text](image.png)
+![Alt text](imgs/cli_shot.png)
 
 If you want to develop on our project, checkout our wonderful and written-with-heart `autogdb_demo.py`, it explain everything! run it by Run it by `python3 autogpt_demo.py`
 
