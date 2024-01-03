@@ -19,7 +19,7 @@ lo = Logger()
 def check_for_keys():
     try:
         from api_key import OPENAI_API_KEY, OPENAI_API_BASE
-        lo.success("api_key founded!!!")
+        lo.success("API Key and API Base found!!!!")
     except ImportError:
         lo.fail("API key and base URL not found.")
         OPENAI_API_KEY = input("Please enter your OpenAI API key: ").strip()
@@ -36,7 +36,9 @@ def check_for_keys():
 
     return OPENAI_API_KEY, OPENAI_API_BASE
 
-
+def console_input(input_str: str) -> str:
+    print(input_str, end='')
+    return input()
 
 def get_server_info():
     if os.path.exists(CACHE_FILE_PATH):
@@ -55,8 +57,8 @@ def get_server_info():
                 lo.fail("Cache file is corrupted. Please enter server details again.")
 
     # Cache file doesn't exist or is corrupted, ask the user for info
-    server_ip = console.input("[bold light_steel_blue1]Please enter your server IP:[/bold light_steel_blue1] ").strip()
-    server_port = console.input("[bold light_steel_blue1]Please enter your server port:[/bold light_steel_blue1] ").strip()
+    server_ip = console_input("[bold light_steel_blue1][?] Please enter your server IP:[/bold light_steel_blue1] ").strip()
+    server_port = console_input("[bold light_steel_blue1][?] Please enter your server port:[/bold light_steel_blue1] ").strip()
     try:
         with open(CACHE_FILE_PATH, 'w') as cache_file:
             json.dump({'ip': server_ip, 'port': server_port}, cache_file)

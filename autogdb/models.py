@@ -100,6 +100,8 @@ class ChatAgent:
         self.llm = ChatOpenAI(
             temperature=0.5,
             model_name='gpt-4-1106-preview',
+            openai_api_key=api_key,
+            openai_api_base=api_base,
             streaming=True,
             callbacks=[FinalStreamingStdOutCallbackHandler()]
             )
