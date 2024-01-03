@@ -57,9 +57,15 @@ def remove_ansi_escape_sequences(text):
     ''', re.VERBOSE)
     return ansi_escape_pattern.sub('', text)
 
-@app.get("/test-connection/")
-async def see_callback():
+binary_name = ''
+@app.get("/test-connection-gdb/")
+async def see_callback(binary_name: str):
+    binary_name = binary_name
     return {"message": "success"}
+
+@app.get("/test-connection-cli/")
+async def see_callback():
+    return {"message": "success","binary_name":binary_name}
 
 @app.post("/see-callback/")
 async def see_callback(request: Request):

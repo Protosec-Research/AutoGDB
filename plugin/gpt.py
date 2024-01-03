@@ -65,11 +65,12 @@ class GdbGptCommand(gdb.Command):
         super(GdbGptCommand, self).__init__("autogdb", gdb.COMMAND_USER)
         self.server = None
         self.port = None
+        self.binary_name = None
 
     def test_connection(self):
         server_url = f"http://{self.server}:{self.port}"
         try:
-            response = session_without_proxies.get(f"{server_url}/test-connection/", timeout=3)
+            response = session_without_proxies.get(f"{server_url}/test-connection-gdb/?binary_name={self.binary_name}", timeout=3)
             if response.status_code == 200:
                 lo.success(f"Connected to {server_url}!!!")
             else:

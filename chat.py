@@ -30,12 +30,12 @@ def banner():
     """
     print(banner)
     print(author)
-    print('\n\n')
+    print('\n')
 
 def check_for_keys():
     try:
         from api_key import OPENAI_API_KEY, OPENAI_API_BASE
-        lo.success("API Key and API Base found!!!!")
+        # lo.success("API Key and API Base found!!!!")
     except ImportError:
         lo.fail("API key and base URL not found.")
         OPENAI_API_KEY = input("Please enter your OpenAI API key: ").strip()
@@ -96,7 +96,7 @@ def cli():
     while True:
         print(f"\n  [bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]>>> ",end='')
         text_query = input()
-        print(f"\n  [bold medium_purple1]:snowboarder: GDBAgent[/bold medium_purple1]: ", end='')
+        print(f"  [bold medium_purple1]:snowboarder: GDBAgent[/bold medium_purple1]: ", end='')
         chatagent.chat_and_assign(text_query)
 
 if __name__ == "__main__":
