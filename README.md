@@ -8,6 +8,12 @@ This project includes:
 * `/server` **fastapi backend server**, use to dealt with you infomation and gpts, acts like a bridge in between
 * `/autogdb` **autogpt pip package**
 
+#Installing:
+If you are new to AutoGDB, clone our project first!
+```shell
+git clone https://github.com/retr0reg/AutoGDB.git && cd AutoGDB
+``` 
+
 # Setup Server-side
 
 ```shell
@@ -33,9 +39,18 @@ pwndbg> autogdb <YOUR_SERVER_IP> <YOUR_SERVER_PORT>
 * `YOUR_SERVER_PORT` : Port for this server
 
 ## ChatGPT with gdb
-Checkout our wonderful and written-with-heart `autogdb_demo.py`, it explain everything! run it by Run it by `python3 autogpt_demo.py`
+Run `chat.py`, chat with you own AutoGDB!
+```
+python3 chat.py
+```
+
+![Alt text](image.png)
+
+If you want to develop on our project, checkout our wonderful and written-with-heart `autogdb_demo.py`, it explain everything! run it by Run it by `python3 autogpt_demo.py`
 
 **In gdb, make sure to first run the program and Ctrl-C to stop, then enters the autogdb command**
+
+
 
 here's one wonderful example of analysis made by **GPT4, OpenAI**
 ```python
