@@ -36,10 +36,11 @@ def banner():
     print('\n')
 
 def check_for_keys():
-    try:
-        from api_key import OPENAI_API_KEY, OPENAI_API_BASE
-        # lo.success("API Key and API Base found!!!!")
-    except ImportError:
+    OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", default="https://api.openai.com/v1")
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    lo.success("Loaded API key and base URL from environment.")
+    
+    if OPENAI_API_KEY == None:
         lo.fail("API key and base URL not found.")
         OPENAI_API_KEY = input("Please enter your OpenAI API key: ").strip()
         OPENAI_API_BASE = input("Please enter the OpenAI API base URL: ").strip()

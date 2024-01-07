@@ -12,7 +12,15 @@ from autogdb import AutoGDB, PwnAgent
 
 # Import API keys from a secure location.
 # Make sure to create an api_key.py file with your personal OPENAI_API_KEY and OPENAI_API_BASE variables.
-from api_key import OPENAI_API_KEY, OPENAI_API_BASE
+import os
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", default="https://api.openai.com/v1")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+if OPENAI_API_KEY == None:
+    try:
+        from api_key import OPENAI_API_BASE, OPENAI_API_KEY
+    except ImportError:
+        print("Please create an api_key.py file with your personal OPENAI_API_KEY and OPENAI_API_BASE variables or set the environment variables.")
+    exit(1)
 
 # Main execution point of the script.
 if __name__ == "__main__":
