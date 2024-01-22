@@ -7,10 +7,10 @@
 <a href="#"><img src="https://img.shields.io/badge/platform-osx%2Flinux%2Fwindows-blueviolet"></a>
 </p>
 
-AutoGDB that focused on combining the power of ChatGPT on reverse-engineering, binary-exploition jobs. 
+AutoGDB focused on combining the power of ChatGPT on reverse-engineering, binary-exploitation jobs. 
 This project includes:
 * `/plugin` **the plugin that your gdb needs to connect to your server**
-* `/server` **fastapi backend server**, use to dealt with you infomation and gpts, acts like a bridge in between
+* `/server` **fastapi backend server**, use to deal with you information and gpts, acts like a bridge between
 * `/autogdb` **autogpt pip package**
 
 #Installing:
@@ -44,16 +44,16 @@ pwndbg> autogdb <YOUR_SERVER_IP> <YOUR_SERVER_PORT>
 * `YOUR_SERVER_PORT` : Port for this server
 
 ## ChatGPT with gdb
-Run `chat.py`, chat with you own AutoGDB!
+Run `chat.py`, and chat with your own AutoGDB!
 ```
 python3 chat.py
 ```
 
 ![Alt text](imgs/cli_shot.png)
 
-If you want to develop on our project, checkout our wonderful and written-with-heart `autogdb_demo.py`, it explain everything! run it by Run it by `python3 autogpt_demo.py`
+If you want to develop our project, check out our wonderful and written-with-heart `autogdb_demo.py`, it explains everything! run it by `python3 autogpt_demo.py`
 
-**In gdb, make sure to first run the program and Ctrl-C to stop, then enters the autogdb command**
+**In gdb, make sure first to run the program and Ctrl-C to stop, then enter the autogdb command**
 
 
 
