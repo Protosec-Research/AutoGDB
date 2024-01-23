@@ -21,6 +21,15 @@ git clone https://github.com/retr0reg/AutoGDB.git && cd AutoGDB
 
 # Setup Server-side
 
+The Server-side of AutoGDB can be pull and used by using docker;
+```shell
+docker pull retr0regd/autogdb-server:latest
+docker run -p 5000:5000 retr0regd/autogdb-server:latest
+```
+After this, the server will be running on `5000` port in `127.0.0.1`
+
+Or you may simply use `python3` to install:
+
 ```shell
 python3 -m pip install -r requirements.txt && chmod +x ./run.sh
 ```

@@ -52,7 +52,7 @@ class PwnAgent:
     
     def __init__(self,api_key: str,api_base: str,autogdb: Tool) -> None:
         self.autogdb = autogdb
-        self.llm = ChatOpenAI(temperature=1,
+        self.llm = ChatOpenAI(temperature=0.5,
             model_name='gpt-4-1106-preview',
             openai_api_base=api_base,
             openai_api_key=api_key,
@@ -62,11 +62,15 @@ class PwnAgent:
         self.template = """\
             You are a serious CTF player who don't make reckless decision. You can use gdb\
             * Process-based analysis and dynamic analysis is recommanded.\
-            * Use \'continue\', but never use \'run\' \
+            * The program is already running
             * Keep using gdb if you want until you solve the problem throughly \
-            * You can use commands like stack, heap, that is built in pwndbg version of gdb\
+            * You can use commands like stack, rop, heap, that is built in pwndbg version of gdb\
             * When you use command \'run\', the user will help you Ctrl+C the program manuly.\\n\n
-            * Try to use less of functions like \'info functions\', since it generate long response and you cant retrieve all of it\
+            * disassemble main are recommand starter for analysing\
+            * When analysing the offset of stack overflows, pay attention to actual position of the variable on the stack\
+            * use python3 and pyload look like run < <(python -c "print('A'*116 + 'B'*4 + 'C'*4)") to try to generate payloads\
+            * When reporting a vulnerabilty, make sure to notice where the trigger, how can it be triggered?\
+            * When you are ask to generate a payload for a vulnerabilty, you only need to return the basic structure of the pwntools exploition (b'a'*x+p64(address_of_return)...)
             """
         
         self.sysmessage = SystemMessage(content=self.template)
