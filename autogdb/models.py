@@ -11,6 +11,8 @@ from langchain.chat_models.openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import SystemMessage
+from . import pwndbg
+
 class AutoGDB:
 
     def __init__(self,server: str,port: str) -> None:
@@ -59,7 +61,9 @@ class PwnAgent:
             streaming=True,
             )
         
-        self.template = """\
+        self.template = f"""\
+            A list of valid pwndbg commands: \n
+            {pwndbg.base_prompt()} \n
             You are a serious CTF player who don't make reckless decision. You can use gdb\
             * Process-based analysis and dynamic analysis is recommanded.\
             * The program is already running
@@ -79,7 +83,7 @@ class PwnAgent:
 
         self.agent = initialize_agent(
             agent="zero-shot-react-description",
-            tools=[self.autogdb],
+            tools=[self.autogdb, pwndbg.read_command_docs],
             llm=self.llm,
             verbose=True,
             agent_kwargs={
@@ -115,7 +119,9 @@ class ChatAgent:
             description="Assign a job for your GDB Agent to do (For example: Find vulnerability in this binary)"
         )
 
-        self.template = """\
+        self.template = f"""\
+            A list of valid pwndbg commands: \n
+            {pwndbg.base_prompt()} \n
             You are a Reverse-engineering assistance call autoGDB, who have the ability call other assistance who have ability to use gdb.
             Your user may ask you to analysis some binary file, they meant the binary file that you \"Gdb assistance\" is dynamic-debugging.
             Your \"Gdb assistance\" have the ability to analysis and deduct the task you send and dynamic-debug it in gdb (with pwndbg installed) in vert-thought steps.
@@ -127,7 +133,7 @@ class ChatAgent:
 
         self.chat_conversation_agent = initialize_agent(
             agent="chat-conversational-react-description",
-            tools=[self.tool],
+            tools=[self.tool, pwndbg.read_command_docs],
             llm=self.llm,
             verbose=False,
             max_iterations=3,
