@@ -15,32 +15,13 @@ This project includes:
 
 #Installing:
 If you are new to AutoGDB, clone our project first!
+# GDB plugin:
 ```shell
 git clone https://github.com/retr0reg/AutoGDB.git && cd AutoGDB
+chmod +x ./install.sh && ./install.sh
 ``` 
+`install.sh` will add `plugin/gpt.py` in to your `~/.gdbinit` as a gdb plugin; Or you can do it by editing `~/.gdbinit` manually;
 
-# Setup Server-side
-
-The Server-side of AutoGDB can be pull and used by using docker;
-```shell
-docker pull retr0regd/autogdb-server:latest
-docker run -p 5000:5000 retr0regd/autogdb-server:latest
-```
-After this, the server will be running on `5000` port in `127.0.0.1`
-
-Or you may simply use `python3` to install:
-
-```shell
-python3 -m pip install -r requirements.txt && chmod +x ./run.sh
-```
-after installing requirements, you can run the server by `./run.sh`
-
-
-# GDB Plugin
-
-*(BE NOTICED THAT THE PLUGIN AUTOMATIC ESCAPE ANY PROXY SETTINGS, SINCE THIS VERSION OF GDB <3 GPT IS MENT TO RUN UNDER LOCAL LOCALHOST)*
-
-Download it & load it & use it
 ```shell
 echo "/YOUR/PATH/TO/autogdb/plugin/gpt.py" >> ~/.gdbinit
 ```
@@ -52,7 +33,7 @@ pwndbg> autogdb <YOUR_SERVER_IP> <YOUR_SERVER_PORT>
 * `YOUR_SERVER_IP` : Your ip for the backend server
 * `YOUR_SERVER_PORT` : Port for this server
 
-## ChatGPT with gdb
+## Chat with GDB！
 Run `chat.py`, and chat with your own AutoGDB!
 ```
 python3 chat.py
@@ -108,3 +89,19 @@ Final Answer: The binary has a format string vulnerability due to the use of an 
 
 > Finished chain.
 ```
+# Setup Server-side
+**After the `AutoGDB1.2` Version, Serverside-settings will be done within the `chat.py`**, if you have problems with AutoGDB server, you may run `python3 chat.py --serverless` in serverless mode, with ip and ports in `.server_cache_autogdb.json`
+
+The Server-side of AutoGDB can be pull and used by using docker;
+```shell
+docker pull retr0regd/autogdb-server:latest
+docker run -p 5000:5000 retr0regd/autogdb-server:latest
+```
+After this, the server will be running on `5000` port in `127.0.0.1`
+
+Or you may simply use `python3` to install:
+
+```shell
+python3 -m pip install -r requirements.txt && chmod +x ./run.sh
+```
+after installing requirements, you can run the server by `./run.sh`

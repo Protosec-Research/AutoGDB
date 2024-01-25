@@ -5,8 +5,7 @@ import os
 from rich import print
 from rich.progress import Progress
 import readline
-
-
+import argparse
 import warnings
 
 
@@ -17,6 +16,14 @@ CACHE_FILE_PATH = '.server_cache.autogdb.json'
 
 
 lo = Logger()
+
+parser = argparse.ArgumentParser(
+    prog='AutoGDB',
+    description='Enable GPT in your reversing job with GDB.'
+)
+
+parser.add_argument('--serverless',help='Run AutoGDB without bulit-in server',dest='serverless',action='store_true')
+args = parser.parse_args()
 
 def clear_screen():
     import platform
@@ -140,11 +147,14 @@ class AutoGDBServer:
 def setup():
     USER_OPENAI_API_KEY, USER_OPENAI_API_BASE = check_for_keys()
     ip, port = get_server_info()
-    autogdb_server = AutoGDBServer(ip,port)
-    autogdb_server.start_uvicorn()
     pwnagent = PwnAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, AutoGDB(server=ip, port=port).tool())
     chatagent = ChatAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, pwnagent)
-    return chatagent, autogdb_server
+    if args.serverless:
+        return chatagent, None
+    else:
+        autogdb_server = AutoGDBServer(ip,port)
+        autogdb_server.start_uvicorn()
+        return chatagent, autogdb_server
 
 def cli():
     chatagent, autogdb_server = setup()
@@ -161,7 +171,8 @@ def cli():
         lo.fail(e)
 
     finally:
-        autogdb_server.exit()
+        if not args.serverless:
+            autogdb_server.exit()
 
 if __name__ == "__main__":
     banner()
