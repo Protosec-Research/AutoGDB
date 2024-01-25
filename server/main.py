@@ -6,12 +6,37 @@ from fastapi.responses import JSONResponse
 import httpx
 import base64
 
-def decode_response(encoded_text):
+def decode_bs64(encoded_text):
     base64_bytes = encoded_text.encode('utf-8')
     text_bytes = base64.b64decode(base64_bytes)
     return text_bytes.decode('utf-8')
 
-SERVER = "http://192.168.31.251:5000"
+def encode_bs64(text):
+    text_bytes = text.encode('utf-8')
+    base64_bytes = base64.b64encode(text_bytes)
+    return base64_bytes.decode('utf-8')
+
+import os
+import json
+CACHE_FILE_PATH = '../.server_cache.autogdb.json'
+def get_server_info():
+    if os.path.exists(CACHE_FILE_PATH):
+        with open(CACHE_FILE_PATH, 'r') as cache_file:
+            try:
+                server_info = json.load(cache_file)
+                addr = server_info['ip']
+                port = server_info['port']
+                
+                if (not addr) or (not port):
+                    raise KeyError(f"Server address and port saved is empty, please save it again by deleting:{CACHE_FILE_PATH}")
+                
+                return addr,port
+                
+            except json.JSONDecodeError:
+                print("Cache file is corrupted. Please enter server details again.")
+
+ip,port = get_server_info()
+SERVER = f"http://{ip}:{port}"
 instructions_list = []
 
 app = FastAPI()
@@ -70,12 +95,12 @@ async def see_callback():
 @app.post("/see-callback/")
 async def see_callback(request: Request):
     item = await request.json()
-    res = remove_ansi_escape_sequences(decode_response(item['response']))
+    res = remove_ansi_escape_sequences(decode_bs64(item['response']))
     if len(res) > 2040:
         notion = "Since the respone is too long, only first 2040 is noted."
         results_dict[item['instruction']] = notion + res[:(2040-len(notion))]
         return {"message": "Response received successfully, but too long"}
-    results_dict[item['instruction']] = remove_ansi_escape_sequences(decode_response(item['response']))
+    results_dict[item['instruction']] = remove_ansi_escape_sequences(decode_bs64(item['response']))
     return {"message": "Response received successfully"}
 
 import httpx

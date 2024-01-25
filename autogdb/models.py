@@ -3,6 +3,7 @@
 @author: retr0@retr0.blog
 """
 
+import base64
 from langchain.agents import Tool
 import httpx
 import asyncio
@@ -12,6 +13,18 @@ from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import SystemMessage
 from . import pwndbg
+
+import base64
+
+def decode_bs64(encoded_text):
+    base64_bytes = encoded_text.encode('utf-8')
+    text_bytes = base64.b64decode(base64_bytes)
+    return text_bytes.decode('utf-8')
+
+def encode_bs64(text):
+    text_bytes = text.encode('utf-8')
+    base64_bytes = base64.b64encode(text_bytes)
+    return base64_bytes.decode('utf-8')
 
 class AutoGDB:
 
@@ -39,7 +52,7 @@ class AutoGDB:
             return response.text
         
     def gdb_run(self,command: str = None) -> str:
-        return asyncio.run(self.gdb_send(str(command)))
+        return asyncio.run(self.gdb_send(encode_bs64(str(command))))
 
     def tool(self) -> Tool:
         return Tool(

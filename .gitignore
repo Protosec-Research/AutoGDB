@@ -5,7 +5,7 @@ __pycache__/
 
 api_key.py
 .gdb_history
-.server_cache.auotogpt.json
+.server_cache.autogdb.json
 # C extensions
 *.so
 

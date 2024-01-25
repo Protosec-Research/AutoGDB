@@ -11,7 +11,7 @@ AutoGDB focused on combining the power of ChatGPT on reverse-engineering, binary
 This project includes:
 * `/plugin` **the plugin that your gdb needs to connect to your server**
 * `/server` **fastapi backend server**, use to deal with you information and gpts, acts like a bridge between
-* `/autogdb` **autogpt pip package**
+* `/autogdb` **autogdb pip package**
 
 #Installing:
 If you are new to AutoGDB, clone our project first!
@@ -60,7 +60,7 @@ python3 chat.py
 
 ![Alt text](imgs/cli_shot.png)
 
-If you want to develop our project, check out our wonderful and written-with-heart `autogdb_demo.py`, it explains everything! run it by `python3 autogpt_demo.py`
+If you want to develop our project, check out our wonderful and written-with-heart `autogdb_demo.py`, it explains everything! run it by `python3 autogdb_demo.py`
 
 **In gdb, make sure first to run the program and Ctrl-C to stop, then enter the autogdb command**
 

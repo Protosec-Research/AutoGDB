@@ -1,21 +1,25 @@
+import base64
 import gdb
 import requests
 import time
-
-import gdb
 import os
 import signal
+
+import base64
+
+def decode_bs64(encoded_text):
+    base64_bytes = encoded_text.encode('utf-8')
+    text_bytes = base64.b64decode(base64_bytes)
+    return text_bytes.decode('utf-8')
+
+def encode_bs64(text):
+    text_bytes = text.encode('utf-8')
+    base64_bytes = base64.b64encode(text_bytes)
+    return base64_bytes.decode('utf-8')
 
 session_without_proxies = requests.Session()
 session_without_proxies.trust_env = False
 # This is without proxy; only for testing
-
-import base64
-
-def encode_response(text):
-    text_bytes = text.encode('utf-8')
-    base64_bytes = base64.b64encode(text_bytes)
-    return base64_bytes.decode('utf-8')
 
 class Logger:
     def __init__(self) -> None:
@@ -48,7 +52,7 @@ lo = Logger()
 def send_response(response, command, SERVER,success=False):
     try:
         # Adjust the field names if necessary to match the expected schema
-        json_payload = {"response": encode_response(response), "instruction": command}
+        json_payload = {"response": encode_bs64(response), "instruction": encode_bs64(command)}
         rs = session_without_proxies.post(f"{SERVER}/see-callback/", json=json_payload)
         # Now use without proxies
         if rs.status_code == 200:
@@ -58,11 +62,11 @@ def send_response(response, command, SERVER,success=False):
     except Exception as e:
         lo.fail(f'Exception occurred while sending response: {e}')
 
-class GdbGptCommand(gdb.Command):
+class AutoGDBCommand(gdb.Command):
     "Fetch and execute commands from a remote server"
 
     def __init__(self):
-        super(GdbGptCommand, self).__init__("autogdb", gdb.COMMAND_USER)
+        super(AutoGDBCommand, self).__init__("autogdb", gdb.COMMAND_USER)
         self.server = None
         self.port = None
         self.binary_name = None
@@ -78,7 +82,6 @@ class GdbGptCommand(gdb.Command):
         except requests.exceptions.RequestException as e:
             lo.fail(f"Connection to {server_url} failed. Error: {e}")
     
-
     def invoke(self, arg, from_tty):
         if arg:
             args = arg.split()
@@ -99,7 +102,8 @@ class GdbGptCommand(gdb.Command):
                 time.sleep(2)
                 if response.status_code == 200:
                     data = response.json()
-                    instruction = str(data.get('instruction'))
+                    instruction = decode_bs64(str(data.get('instruction')))
+                    print(instruction)
                     if instruction:
                         lo.success(f"Executing instruction from server: {instruction}")
                         if instruction == "run" or instruction =='r':
@@ -132,4 +136,4 @@ class GdbGptCommand(gdb.Command):
                 lo.fail(f"An error occurred: {e}")
                 time.sleep(2)
 
-GdbGptCommand()
+AutoGDBCommand()
