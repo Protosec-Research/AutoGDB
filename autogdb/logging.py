@@ -11,18 +11,18 @@ class Logger:
 
         self.RESET_COLOR = "\033[0m"
 
-    def info(self,message,PrevReturn=False):
+    def info(self,message,PrevReturn=False,end='\n'):
         if not PrevReturn:
-            print(f"    {self.INFO_PREFIX} {self.INFO_TEXT_COLOR}{message}{self.RESET_COLOR}")
+            print(f"    {self.INFO_PREFIX} {self.INFO_TEXT_COLOR}{message}{self.RESET_COLOR}",end=end)
         else:
-            print(f"    \n\n{self.INFO_PREFIX} {self.INFO_TEXT_COLOR}{message}{self.RESET_COLOR}")
+            print(f"    \n\n{self.INFO_PREFIX} {self.INFO_TEXT_COLOR}{message}{self.RESET_COLOR}",end=end)
         
 
     def success(self,message,PrevReturn=False):
         if not PrevReturn:
             print(f"    {self.SUCCESS_PREFIX} {self.SUCCESS_TEXT_COLOR}{message}{self.RESET_COLOR}")
         else:
-            print(f"    \n\n{self.SUCCESS_PREFIX} {self.SUCCESS_TEXT_COLOR}{message}{self.RESET_COLOR}")
+            print(f"\n\n    {self.SUCCESS_PREFIX} {self.SUCCESS_TEXT_COLOR}{message}{self.RESET_COLOR}")
 
     def fail(self,message):
         print(f"    {self.FAILURE_PREFIX} {self.FAILURE_TEXT_COLOR}{message}{self.RESET_COLOR}")

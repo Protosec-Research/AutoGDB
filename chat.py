@@ -8,7 +8,6 @@ import readline
 import argparse
 import warnings
 
-
 warnings.filterwarnings("ignore", message="You are trying to use a chat model.*")
 from rich import print
 
@@ -132,7 +131,8 @@ class AutoGDBServer:
             if not self.check_port():
                 raise Exception(f"The port {self.port} for autogdb server is used/busy, please change your port")
             lo.success(f"AutoGDB server started at {self.url}:{self.port}")
-            lo.info(f"You can use: autogdb {self.url} {self.port}")
+            lo.info(f"You can use: ",end='')
+            print(f"[bold green]autogdb {self.url} {self.port}[/bold green]")
             self.proc = subprocess.Popen(["uvicorn", "main:app", "--host", str(self.url), "--port", str(self.port), "--reload"],
                                         stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,
                                         cwd="server/"
@@ -144,17 +144,46 @@ class AutoGDBServer:
     def exit(self):
         os.killpg(os.getpgid(self.proc.pid), signal.SIGTERM)
 
+import time
+from rich.progress import Progress, SpinnerColumn, TextColumn
+def await_until_connection(autogdb: AutoGDB):
+    lo.info("Waiting AutoGDB to connect....")
+    with Progress("   ",SpinnerColumn(), "[progress.description]{task.description}",transient=True) as progress:
+        task = progress.add_task("Waiting for connecting...", total=None)
+        while True:
+            try:
+                frame = autogdb.await_autogdb_connecton()
+                if frame['message'] == 'success':
+                    lo.success(f"Recieved connection from:",PrevReturn=True)
+                    print(f"[bold medium_purple1]    Binary Name: {frame['name']}\n    Binary Path: {frame['path']}[/bold medium_purple1]")
+                    return frame['name'],frame['path']
+                elif frame['message'] == 'awaiting':
+                    pass
+                elif frame['message'] == 'error':
+                    lo.fail(f"Error recieved from AutoGDB connection: {frame['detail']}")
+                else:
+                    lo.fail(f"Unknown respone from AutoGDB connection: {frame}")
+            except Exception as e:
+                pass
+            time.sleep(5)
+            progress.update(task, advance=0.1)
+
+
 def setup():
     USER_OPENAI_API_KEY, USER_OPENAI_API_BASE = check_for_keys()
     ip, port = get_server_info()
-    pwnagent = PwnAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, AutoGDB(server=ip, port=port).tool())
-    chatagent = ChatAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, pwnagent)
+    autogdb = AutoGDB(server=ip, port=port)
+    autogdb_server = AutoGDBServer(ip,port)
     if args.serverless:
-        return chatagent, None
+        pass
     else:
-        autogdb_server = AutoGDBServer(ip,port)
         autogdb_server.start_uvicorn()
-        return chatagent, autogdb_server
+
+    name,path = await_until_connection(autogdb=autogdb)
+    pwnagent = PwnAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, autogdb.tool(),binary_name=name,binary_path=path)
+    chatagent = ChatAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, pwnagent)
+    return chatagent, autogdb_server
+
 
 def cli():
     chatagent, autogdb_server = setup()

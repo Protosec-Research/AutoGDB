@@ -37,6 +37,7 @@ def get_server_info():
 ip,port = get_server_info()
 SERVER = f"http://{ip}:{port}"
 instructions_list = []
+current_binary = None
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")  # Make sure 'templates' directory exists
@@ -81,15 +82,26 @@ def remove_ansi_escape_sequences(text):
     ''', re.VERBOSE)
     return ansi_escape_pattern.sub('', text)
 
-binary_name = ''
+class NewConnectedBinary:
+
+    def __init__(self,name,path) -> None:
+        self.name = name
+        self.path = path
+
 @app.get("/test-connection-gdb/")
-async def see_callback(binary_name: str):
-    binary_name = binary_name
+async def test_connection_gdb(binary_name: str,binary_path: str):
+    global current_binary
+    current_binary = NewConnectedBinary(name=binary_name,path=binary_path)
     return {"message": "success"}
 
 @app.get("/test-connection-cli/")
-async def see_callback():
-    return {"message": "success","binary_name":binary_name}
+async def test_connection_cli():
+    if current_binary == None:
+        return {"message": "failed", "detail": "No binary is in-use"}
+    return {"message": "success",
+            "binary_name":current_binary.name,
+            "binary_path": current_binary.path
+            }
 
 @app.post("/see-callback/")
 async def see_callback(request: Request):

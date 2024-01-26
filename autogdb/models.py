@@ -37,6 +37,32 @@ class AutoGDB:
         self.port = port
         self.server_body = f"{self.server}:{self.port}"
 
+    def await_autogdb_connecton(self):
+        """
+        Awaiting autoGDB connection
+        """
+        import requests
+        session_without_proxies = requests.Session()
+        session_without_proxies.trust_env = False
+        endpoint_url = f"http://{self.server_body}/test-connection-cli/"
+        try:
+            response = session_without_proxies.get(endpoint_url)
+            if response.status_code == 200:
+                data = response.json()
+                if data['message'] == 'success':
+                    return {'message':'success',
+                            'name':data['binary_name'],
+                            'path':data['binary_path']
+                            }
+                else:
+                    return {'message':'awaiting'}
+            else:
+                return {'message':'error','detail':response.status_code}
+        except requests.exceptions.ConnectionError:
+                pass
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+
     async def gdb_send(self,command: str = None) -> str:
         """
         Sends a command to a local server and awaits the response.
@@ -65,7 +91,14 @@ class AutoGDB:
 
 class PwnAgent:
     
-    def __init__(self,api_key: str,api_base: str,autogdb: Tool) -> None:
+    def __init__(self,api_key: str,
+                api_base: str, 
+                autogdb: Tool, 
+                binary_name='Unknown',
+                binary_path='Unknown'
+            ) -> None:
+        
+
         self.autogdb = autogdb
         self.llm = ChatOpenAI(temperature=0.5,
             model_name='gpt-4-1106-preview',
@@ -75,9 +108,10 @@ class PwnAgent:
             )
         
         self.template = f"""\
+            You are a serious reverse-engineering helper who don't make reckless decision. You can use gdb\
+            Current File name: {binary_name}, Path: {binary_path}
             A list of valid pwndbg commands: \n
             {pwndbg.base_prompt()} \n
-            You are a serious CTF player who don't make reckless decision. You can use gdb\
             * Process-based analysis and dynamic analysis is recommanded.\
             * The program is already running
             * Keep using gdb if you want until you solve the problem throughly \

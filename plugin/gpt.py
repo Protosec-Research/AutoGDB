@@ -69,21 +69,38 @@ class AutoGDBCommand(gdb.Command):
         super(AutoGDBCommand, self).__init__("autogdb", gdb.COMMAND_USER)
         self.server = None
         self.port = None
-        self.binary_name = None
 
-    def get_binary_name(self) -> str:
-        
+    def get_binary_info(self) -> (str, str):
+        self.name, self.path = None, None
 
+        try:
+            info_file_output = gdb.execute("info file", to_string=True)
+            for line in info_file_output.split('\n'):
+                if "Symbols from" in line:
+                    self.path = line.split('"')[1]
+                    self.name = os.path.basename(self.path) 
+                    break
+                else:
+                    pass
+
+        except Exception as e:
+            print(f"Error while getting binary info: {e}")
+            self.name, self.path = "unknown", "unknown"
+
+        return self.name, self.path
+    
     def test_connection(self):
         server_url = f"http://{self.server}:{self.port}"
+        lo.info(f"Waiting for connection at {server_url}")
         try:
-            response = session_without_proxies.get(f"{server_url}/test-connection-gdb/?binary_name={self.binary_name}", timeout=3)
+            binary_name, binary_path = self.get_binary_info()
+            response = session_without_proxies.get(f"{server_url}/test-connection-gdb/?binary_name={binary_name}&binary_path={binary_path}", timeout=3)
             if response.status_code == 200:
                 lo.success(f"Connected to {server_url}!!!")
             else:
-                lo.fail(f"Connection to {server_url} failed. Status Code: {response.status_code}")
-        except requests.exceptions.RequestException as e:
-            lo.fail(f"Connection to {server_url} failed. Error: {e}")
+                pass
+        except:
+            pass
     
     def invoke(self, arg, from_tty):
         if arg:
