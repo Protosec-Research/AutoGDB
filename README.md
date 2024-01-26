@@ -10,7 +10,7 @@
 AutoGDB focused on combining the power of ChatGPT on reverse-engineering, binary-exploitation jobs. 
 This project includes:
 * `/plugin` **the plugin that your gdb needs to connect to your server**
-* `/server` **fastapi backend server**, use to deal with you information and gpts, acts like a bridge between
+* `/server` **fastapi backend server**, use to deal with your information and gpts, acts like a bridge between
 * `/autogdb` **autogdb pip package**
 
 # Installing:
