@@ -22,18 +22,17 @@ CACHE_FILE_PATH = '../.server_cache.autogdb.json'
 def get_server_info():
     if os.path.exists(CACHE_FILE_PATH):
         with open(CACHE_FILE_PATH, 'r') as cache_file:
-            try:
-                server_info = json.load(cache_file)
-                addr = server_info['ip']
-                port = server_info['port']
+            server_info = json.load(cache_file)
+            addr = server_info['ip']
+            port = server_info['port']
                 
-                if (not addr) or (not port):
-                    raise KeyError(f"Server address and port saved is empty, please save it again by deleting:{CACHE_FILE_PATH}")
+            if (not addr) or (not port):
+                raise KeyError(f"Server address and port saved is empty, please save it again by deleting:{CACHE_FILE_PATH}")
                 
-                return addr,port
+            return addr,port
                 
-            except json.JSONDecodeError:
-                print("Cache file is corrupted. Please enter server details again.")
+            # except json.JSONDecodeError:
+            #     print("Cache file is corrupted. Please enter server details again.")
 
 ip,port = get_server_info()
 SERVER = f"http://{ip}:{port}"

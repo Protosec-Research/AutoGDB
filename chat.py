@@ -95,8 +95,8 @@ def get_server_info():
                 lo.fail("Cache file is corrupted. Please enter server details again.")
 
     # Cache file doesn't exist or is corrupted, ask the user for info
-    server_ip = console_input("[bold light_steel_blue1][?] Please enter your server IP:[/bold light_steel_blue1] ").strip()
-    server_port = console_input("[bold light_steel_blue1][?] Please enter your server port:[/bold light_steel_blue1] ").strip()
+    server_ip = console_input("    [bold light_steel_blue1][?] Please enter your server IP:[/bold light_steel_blue1] ").strip()
+    server_port = console_input("    [bold light_steel_blue1][?] Please enter your server port:[/bold light_steel_blue1] ").strip()
     try:
         with open(CACHE_FILE_PATH, 'w') as cache_file:
             json.dump({'ip': server_ip, 'port': server_port}, cache_file)

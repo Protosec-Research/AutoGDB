@@ -71,6 +71,9 @@ class AutoGDBCommand(gdb.Command):
         self.port = None
         self.binary_name = None
 
+    def get_binary_name(self) -> str:
+        
+
     def test_connection(self):
         server_url = f"http://{self.server}:{self.port}"
         try:
