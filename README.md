@@ -13,7 +13,7 @@ This project includes:
 * `/server` **fastapi backend server**, use to deal with your information and gpts, acts like a bridge between
 * `/autogdb` **autogdb pip package**
 
-![AutoGDB - Automatic Pwn Tool](https://img.youtube.com/vi/FYpdtcC71gg/maxresdefault.jpg)](https://www.youtube.com/watch?v=FYpdtcC71gg)
+[![AutoGDB - Automatic Pwn Tool](https://img.youtube.com/vi/FYpdtcC71gg/maxresdefault.jpg)](https://www.youtube.com/watch?v=FYpdtcC71gg)
 
 
 # Installing:
