@@ -1,3 +1,4 @@
+
 # AutoGDB
 ![AUTOGDB](imgs/AUTOGDB.png)
 <p align="center">
@@ -13,7 +14,7 @@ This project includes:
 * `/server` **fastapi backend server**, use to deal with your information and gpts, acts like a bridge between
 * `/autogdb` **autogdb pip package**
 
-![Using AutoGDB](https://i.imgur.com/mSefUOV.gif)
+[Watch AutoGDB Introduction!!!](https://www.youtube.com/watch?v=FYpdtcC71)
 
 # Installing:
 If you are new to AutoGDB, clone our project first!
