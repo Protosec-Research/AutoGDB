@@ -13,7 +13,7 @@ This project includes:
 * `/server` **fastapi backend server**, use to deal with you information and gpts, acts like a bridge between
 * `/autogdb` **autogdb pip package**
 
-#Installing:
+# Installing:
 If you are new to AutoGDB, clone our project first!
 # GDB plugin:
 ```shell
