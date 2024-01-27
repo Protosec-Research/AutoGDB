@@ -9,12 +9,50 @@ import httpx
 import asyncio
 from langchain.agents import initialize_agent
 from langchain.chat_models.openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import SystemMessage
+import subprocess
+import os
 from . import pwndbg
 
 import base64
+
+class ExploitGenerater:
+    def __init__(self, filepath='./exp.py') -> None:
+        self.filepath = filepath
+
+    def generate_exp(self, content: str = None) -> str:
+        if content is None:
+            return 'No exploit content provided.'
+        
+        try:
+            with open(self.filepath, 'w') as exp_file:
+                exp_file.write(content)
+        except Exception as e:
+            return f'Error writing to file: {e}'
+
+        return 'Exploit script created successfully.'
+
+    def execute_exp(self) -> str:
+        if not os.path.exists(self.filepath):
+            return 'Error: Exploit script does not exist.'
+
+        try:
+            result = subprocess.run(["python3", self.filepath], capture_output=True, text=True)
+            return result.stdout if result.stdout else 'No output from exploit script.'
+        except Exception as e:
+            return f'Error executing the exploit script: {e}'
+    
+    def write_and_execute(self,content: str) -> str:
+        self.generate_exp(content=content)
+        return self.execute_exp(self)
+        
+    def tool(self) -> Tool:
+        return Tool(
+            name="write-and-execute-exploit",
+            func=self.generate_exp,
+            description="Write and Execute a Python3 Pwntools Exploit in to ./exp.py, given arguments: content(the content of this exp.py)"
+        )
 
 def decode_bs64(encoded_text):
     base64_bytes = encoded_text.encode('utf-8')
@@ -87,18 +125,16 @@ class AutoGDB:
         description="Run gdb commands on this binary file on this specific frame in gdb, given arguments: command(only accept gdb in pwndbg version command)"
     )
 
-
-
 class PwnAgent:
     
     def __init__(self,api_key: str,
                 api_base: str, 
-                autogdb: Tool, 
+                autogdb: Tool,
                 binary_name='Unknown',
-                binary_path='Unknown'
+                binary_path='Unknown',
+                clue=''
             ) -> None:
         
-
         self.autogdb = autogdb
         self.llm = ChatOpenAI(temperature=0.5,
             model_name='gpt-4-1106-preview',
@@ -106,6 +142,30 @@ class PwnAgent:
             openai_api_key=api_key,
             streaming=True,
             )
+        
+        self.binary_name = binary_name
+        self.binary_path = binary_path
+        self.clue = clue
+
+        if self.clue: self.clue = "Clues or helpful-description on this project: " + self.clue
+
+        # THIS TEMPLATE HAS ISSUES IN REACT, THUS DISABLE UNTILL REASON FIND OUT
+        # self.template = f"""\
+        #     You are a serious reverse-engineering helper who don't make reckless decision. You can use gdb\
+        #     A list of valid pwndbg commands: \n
+        #     Current File name: {self.binary_name}, Path: {self.binary_path}
+        #     {self.clue}
+        #     {pwndbg.base_prompt()} \n
+        #     * Process-based analysis and dynamic analysis is recommanded.\
+        #     * disassemble main are recommand starter for analysing\
+        #     * The program is already running\
+        #     * Keep using gdb if you want until you solve the problem throughly \
+        #     * when dealing with CTF challenges, remember they are ctf-challenges\
+        #     * When you use command \'run\', the user will help you Ctrl+C the program manuly.\
+        #     * When finding a ideal exploitation, make sure that the payload you provide leads to environmental interact or the flag, for example: b'a'*x+p64(<the_actual_address_of_magic>) is accepted\
+        #     * When analysing the offset of stack overflows, pay attention to actual position of the variable on the stack\
+        #     * When reporting a vulnerabilty, make sure to notice where the trigger, how can it be triggered?\
+        #     """ 
         
         self.template = f"""\
             You are a serious reverse-engineering helper who don't make reckless decision. You can use gdb\
@@ -123,7 +183,7 @@ class PwnAgent:
             * When reporting a vulnerabilty, make sure to notice where the trigger, how can it be triggered?\
             * When you are ask to generate a payload for a vulnerabilty, you only need to return the basic structure of the pwntools exploition (b'a'*x+p64(address_of_return)...)
             """
-        
+
         self.sysmessage = SystemMessage(content=self.template)
 
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -133,6 +193,7 @@ class PwnAgent:
             tools=[self.autogdb, pwndbg.read_command_docs],
             llm=self.llm,
             verbose=True,
+            max_iterations=50,
             agent_kwargs={
                 'system_message': self.template,
             }
@@ -150,6 +211,7 @@ class ChatAgent:
         from langchain.agents import initialize_agent
         from .streaming import FinalStreamingStdOutCallbackHandler
 
+        self.expgenerater = ExploitGenerater().tool()
         self.memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
         self.llm = ChatOpenAI(
             temperature=0.5,
@@ -165,22 +227,24 @@ class ChatAgent:
             func=pwnagent.chat,
             description="Assign a job for your GDB Agent to do (For example: Find vulnerability in this binary)"
         )
-
         self.template = f"""\
             A list of valid pwndbg commands: \n
+            Current File name: {pwnagent.binary_name}, Path: {pwnagent.binary_path}
             {pwndbg.base_prompt()} \n
             You are a Reverse-engineering assistance call autoGDB, who have the ability call other assistance who have ability to use gdb.
             Your user may ask you to analysis some binary file, they meant the binary file that you \"Gdb assistance\" is dynamic-debugging.
             Your \"Gdb assistance\" have the ability to analysis and deduct the task you send and dynamic-debug it in gdb (with pwndbg installed) in vert-thought steps.
-            Feel free to ask for you \"Gdb assistance\" and they will return the final answer to your task or problem to them
-            Meanwhile, you are vert smart, you can find connections and do deduction with information you have.
+            Feel free to ask for you \"Gdb assistance\" and they will return the final answer to your task or problem to them \
+            Meanwhile, you are very smart, you can find connections and do deduction with information you have. \
+            When calling you assistance, since they don't remember what they did before, you can tell them about the conclusions you have previously \
             """
+        
         
         self.sysmessage = SystemMessage(content=self.template)
 
         self.chat_conversation_agent = initialize_agent(
             agent="chat-conversational-react-description",
-            tools=[self.tool, pwndbg.read_command_docs],
+            tools=[self.tool, pwndbg.read_command_docs, self.expgenerater],
             llm=self.llm,
             verbose=False,
             max_iterations=3,

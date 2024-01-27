@@ -7,22 +7,23 @@ from rich.progress import Progress
 import readline
 import argparse
 import warnings
-
 warnings.filterwarnings("ignore", message="You are trying to use a chat model.*")
 from rich import print
 
 CACHE_FILE_PATH = '.server_cache.autogdb.json'
-
-
 lo = Logger()
 
-parser = argparse.ArgumentParser(
-    prog='AutoGDB',
-    description='Enable GPT in your reversing job with GDB.'
-)
+def parsing():
 
-parser.add_argument('--serverless',help='Run AutoGDB without bulit-in server',dest='serverless',action='store_true')
-args = parser.parse_args()
+    parser = argparse.ArgumentParser(
+        prog='AutoGDB',
+        description='Enable GPT in your reversing job with GDB.',
+    )
+    parser.add_argument('--serverless',help='Run AutoGDB without bulit-in server',dest='serverless',action='store_true')
+    parser.add_argument('--clue',help='Possible provided clues or helpful description of this challenge?',dest='clue')
+    return parser.parse_args()
+
+
 
 def clear_screen():
     import platform
@@ -30,6 +31,7 @@ def clear_screen():
         subprocess.run("cls", shell=True)
     else:
         subprocess.run("clear", shell=True)
+
 
 def banner():
     banner = """\
@@ -48,6 +50,7 @@ def banner():
     print(banner,end='')
     print(author,end='')
     print('\n')
+    return banner+author+'\n'
 
 def check_for_keys():
     OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", default="https://api.openai.com/v1")
@@ -149,11 +152,12 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 def await_until_connection(autogdb: AutoGDB):
     lo.info("Waiting AutoGDB to connect....")
     with Progress("   ",SpinnerColumn(), "[progress.description]{task.description}",transient=True) as progress:
-        task = progress.add_task("Waiting for connecting...", total=None)
+        task = progress.add_task("[bold medium_purple2]Waiting for connecting...[/bold medium_purple2]", total=None)
         while True:
             try:
                 frame = autogdb.await_autogdb_connecton()
                 if frame['message'] == 'success':
+                    time.sleep(0.1)
                     lo.success(f"Recieved connection from:",PrevReturn=True)
                     print(f"[bold medium_purple1]    Binary Name: {frame['name']}\n    Binary Path: {frame['path']}[/bold medium_purple1]")
                     return frame['name'],frame['path']
@@ -168,19 +172,26 @@ def await_until_connection(autogdb: AutoGDB):
             time.sleep(5)
             progress.update(task, advance=0.1)
 
-
+args = None
 def setup():
+    global args
     USER_OPENAI_API_KEY, USER_OPENAI_API_BASE = check_for_keys()
     ip, port = get_server_info()
+    args = parsing()
     autogdb = AutoGDB(server=ip, port=port)
     autogdb_server = AutoGDBServer(ip,port)
     if args.serverless:
-        pass
+        name=''
+        path=''
     else:
         autogdb_server.start_uvicorn()
+        name,path = await_until_connection(autogdb=autogdb)
 
-    name,path = await_until_connection(autogdb=autogdb)
-    pwnagent = PwnAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, autogdb.tool(),binary_name=name,binary_path=path)
+    if args.clue:
+        pwnagent = PwnAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, autogdb.tool(),binary_name=name,binary_path=path,clue=args.clue)
+    else:
+        pwnagent = PwnAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, autogdb.tool(),binary_name=name,binary_path=path)
+
     chatagent = ChatAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, pwnagent)
     return chatagent, autogdb_server
 

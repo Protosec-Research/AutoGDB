@@ -107,10 +107,10 @@ async def test_connection_cli():
 async def see_callback(request: Request):
     item = await request.json()
     res = remove_ansi_escape_sequences(decode_bs64(item['response']))
-    if len(res) > 2040:
-        notion = "Since the respone is too long, only first 2040 is noted."
-        results_dict[item['instruction']] = notion + res[:(2040-len(notion))]
-        return {"message": "Response received successfully, but too long"}
+    # if len(res) > 2040:
+    #     notion = "Since the respone is too long, only first 2040 is noted."
+    #     results_dict[item['instruction']] = notion + res[:(2040-len(notion))]
+    #     return {"message": "Response received successfully, but too long"}
     results_dict[item['instruction']] = remove_ansi_escape_sequences(decode_bs64(item['response']))
     return {"message": "Response received successfully"}
 
