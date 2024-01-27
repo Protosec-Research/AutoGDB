@@ -128,12 +128,15 @@ class AutoGDBCommand(gdb.Command):
                         lo.success(f"Executing instruction from server: {instruction}")
                         if instruction == "run" or instruction =='r':
                             lo.info("ChatGPT is running \'run\' command, please manuly use Ctrl+C")
+                        if 'python' in instruction:
+                            lo.info("ChatGPT is running \'python\' command, automatically using python3 instead")
+                            instruction.replace('python','python3')
 
                         try:
                             # Attempt to execute the instruction and capture the output.
                             responses = gdb.execute(instruction, to_string=True)
                             print(responses)
-                            if instruction == "run" or instruction =='r':
+                            if (instruction == "run" or instruction =='r') or ('run' in instruction.split(' ')):
                                 lo.info("please input the extra result of the command \'run\' (The part before ^C): ")
                                 responses += input()
                                 responses = str(responses)
@@ -144,6 +147,11 @@ class AutoGDBCommand(gdb.Command):
                             error_message = f"An error occurred: {error_message}"
                             error_message = str(error_message)
                             lo.fail(error_message)
+                            if (instruction == "run" or instruction =='r') or ('run' in instruction.split(' ')):
+                                lo.info("please input the extra result of the command \'run\' (The part before ^C): ")
+                                responses += input()
+                                responses = str(responses)
+                                print('\r\n\n')
                             send_response(response=error_message, command=instruction, SERVER=server_url,success=False)
 
                 else:
