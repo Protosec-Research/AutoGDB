@@ -14,7 +14,7 @@ This project includes:
 * `/server` **fastapi backend server**, use to deal with your information and gpts, acts like a bridge between
 * `/autogdb` **autogdb pip package**
 
-[Watch AutoGDB Introduction!!!]([https://www.youtube.com/watch?v=FYpdtcC71](https://www.youtube.com/watch?v=FYpdtcC71gg))
+Watch AutoGDB Introduction!!!: https://www.youtube.com/watch?v=FYpdtcC71gg
 
 # Installing:
 If you are new to AutoGDB, clone our project first!
