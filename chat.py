@@ -4,12 +4,10 @@ import os
 
 from rich import print
 from rich.progress import Progress
-import readline
 import argparse
 import warnings
-warnings.filterwarnings("ignore", message="You are trying to use a chat model.*")
-from rich import print
 
+warnings.filterwarnings("ignore", message="You are trying to use a chat model.*")
 CACHE_FILE_PATH = '.server_cache.autogdb.json'
 lo = Logger()
 
@@ -19,10 +17,10 @@ def parsing():
         prog='AutoGDB',
         description='Enable GPT in your reversing job with GDB.',
     )
-    parser.add_argument('--serverless',help='Run AutoGDB without bulit-in server',dest='serverless',action='store_true')
-    parser.add_argument('--clue',help='Possible provided clues or helpful description of this challenge?',dest='clue')
+    parser.add_argument('--serverless',help='Run AutoGDB without bulit-in server',dest='serverless', action='store_true')
+    parser.add_argument('--clue',help='Possible provided clues or helpful description of this challenge?', dest='clue')
+    parser.add_argument('--clean-history',help='Clear previous commandline history of AutoGDB.', action='store_true')
     return parser.parse_args()
-
 
 
 def clear_screen():
@@ -78,7 +76,8 @@ def check_for_keys():
 
 def console_input(input_str: str) -> str:
     print(input_str, end='')
-    return input()
+    input_text = input(' >>> \033[0m')
+    return input_text
 
 def get_server_info():
     if os.path.exists(CACHE_FILE_PATH):
@@ -178,8 +177,15 @@ def setup():
     USER_OPENAI_API_KEY, USER_OPENAI_API_BASE = check_for_keys()
     ip, port = get_server_info()
     args = parsing()
+    history_manager = CliHistory()
     autogdb = AutoGDB(server=ip, port=port)
     autogdb_server = AutoGDBServer(ip,port)
+
+    if args.clean_history:
+        history_manager.clear_history()
+        lo.info("History cleaned!\n")
+        exit()
+
     if args.serverless:
         name=''
         path=''
@@ -193,19 +199,24 @@ def setup():
         pwnagent = PwnAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, autogdb.tool(),binary_name=name,binary_path=path)
 
     chatagent = ChatAgent(USER_OPENAI_API_KEY, USER_OPENAI_API_BASE, pwnagent)
-    return chatagent, autogdb_server
+
+    return chatagent, autogdb_server, history_manager
 
 
 def cli():
-    chatagent, autogdb_server = setup()
+    chatagent, autogdb_server, history_manager = setup()
+
+    history_manager.load_history()
     try:
         while True:
-            text_query = console_input(f"\n  [bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]>>> ")
+            text_query = console_input(f"\n  [bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]")
             print(f"  [bold medium_purple1]:snowboarder: GDBAgent[/bold medium_purple1]: ", end='')
             chatagent.chat_and_assign(text_query)
+            history_manager.save_history()
     
     except KeyboardInterrupt:
         lo.info("Bye!",PrevReturn=True)
+        history_manager.save_history()
 
     except Exception as e:
         lo.fail(e)

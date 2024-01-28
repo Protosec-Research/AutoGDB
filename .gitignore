@@ -6,6 +6,7 @@ __pycache__/
 api_key.py
 .gdb_history
 .server_cache.autogdb.json
+.autogdb.history
 # C extensions
 *.so
 

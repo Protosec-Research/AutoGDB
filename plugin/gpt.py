@@ -125,13 +125,12 @@ class AutoGDBCommand(gdb.Command):
                     instruction = decode_bs64(str(data.get('instruction')))
                     print(instruction)
                     if instruction:
+                        if 'python' in instruction:
+                            lo.info("ChatGPT is running \'python\' command, automatically using python3 instead")
+                            instruction = instruction.replace('python','python3')
                         lo.success(f"Executing instruction from server: {instruction}")
                         if instruction == "run" or instruction =='r':
                             lo.info("ChatGPT is running \'run\' command, please manuly use Ctrl+C")
-                        if 'python' in instruction:
-                            lo.info("ChatGPT is running \'python\' command, automatically using python3 instead")
-                            instruction.replace('python','python3')
-
                         try:
                             # Attempt to execute the instruction and capture the output.
                             responses = gdb.execute(instruction, to_string=True)

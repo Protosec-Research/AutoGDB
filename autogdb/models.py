@@ -17,6 +17,25 @@ from . import pwndbg
 
 import base64
 
+import readline
+class CliHistory:
+    def __init__(self,
+                 history_file = ".autogdb.history"
+                 ) -> None:
+        self.history_file = history_file
+
+    def save_history(self):
+        readline.write_history_file(self.history_file)
+
+    def load_history(self):
+        try:
+            readline.read_history_file(self.history_file)
+        except FileNotFoundError:
+            pass
+    
+    def clear_history(self):
+        readline.clear_history()
+
 class ExploitGenerater:
     def __init__(self, filepath='./exp.py') -> None:
         self.filepath = filepath
@@ -233,10 +252,11 @@ class ChatAgent:
             {pwndbg.base_prompt()} \n
             You are a Reverse-engineering assistance call autoGDB, who have the ability call other assistance who have ability to use gdb.
             Your user may ask you to analysis some binary file, they meant the binary file that you \"Gdb assistance\" is dynamic-debugging.
-            Your \"Gdb assistance\" have the ability to analysis and deduct the task you send and dynamic-debug it in gdb (with pwndbg installed) in vert-thought steps.
+            Your \"Gdb assistance\" have the ability to analysis and deduct the task you send and dynamic-debug it in gdb (with pwndbg installed) in very-thought steps. \
+            When calling you assistance, since they don't remember what they did before, you can tell them about the conclusions you have previously 
+            For example, where the vulnerability is located, and how to exploit and etc \
             Feel free to ask for you \"Gdb assistance\" and they will return the final answer to your task or problem to them \
             Meanwhile, you are very smart, you can find connections and do deduction with information you have. \
-            When calling you assistance, since they don't remember what they did before, you can tell them about the conclusions you have previously \
             """
         
         
