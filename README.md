@@ -41,7 +41,17 @@ Run `chat.py`, and chat with your own AutoGDB!
 ```
 python3 chat.py
 ```
+```
+usage: AutoGDB [-h] [--serverless] [--clue CLUE] [--clean-history]
 
+  Enable GPT in your reversing job with GDB.
+  
+  options:
+    -h, --help       show this help message and exit
+    --serverless     Run AutoGDB without bulit-in server
+    --clue CLUE      Possible provided clues or helpful description of this challenge?
+    --clean-history  Clear previous commandline history of AutoGDB.
+```
 ![Alt text](imgs/cli_shot.png)
 
 If you want to develop our project, check out our wonderful and written-with-heart `autogdb_demo.py`, it explains everything! run it by `python3 autogdb_demo.py`
