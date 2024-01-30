@@ -145,6 +145,7 @@ def await_until_connection(autogdb: AutoGDB):
             progress.update(task, advance=0.1)
 
 def unit_test():
+    USER_OPENAI_API_KEY, USER_OPENAI_API_BASE   = 'test','test'
     ip                                          = 'localhost'
     port                                        = 5000
     autogdb_server                              = AutoGDBServer(ip,port,logger=lo)
@@ -169,10 +170,6 @@ def setup(args):
         history_manager.clear_history()
         lo.info("History cleaned!\n")
         exit()
-
-    if args.unit_test:
-        unit_test()
-        exit(0)
 
     if args.serverless:
         name=''
@@ -209,6 +206,11 @@ def main(chatagent, history_manager):
 def cli():
     args = parsing()
     autogdb_server, history_manager = None, None
+
+    if args.unit_test:
+        unit_test()
+        exit(0)
+
     try:
         banner()
         chatagent, autogdb_server, history_manager = setup(args=args)
