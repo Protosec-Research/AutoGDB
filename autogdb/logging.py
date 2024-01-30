@@ -24,6 +24,7 @@ class Logger:
         else:
             print(f"\n\n    {self.SUCCESS_PREFIX} {self.SUCCESS_TEXT_COLOR}{message}{self.RESET_COLOR}")
 
-    def fail(self,message):
+    def fail(self,message,exit_flag=True):
         print(f"    {self.FAILURE_PREFIX} {self.FAILURE_TEXT_COLOR}{message}{self.RESET_COLOR}")
-        exit(0)
+        if exit_flag==True: 
+            exit(0)
