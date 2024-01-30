@@ -77,6 +77,7 @@ def parsing():
         prog='AutoGDB',
         description='Enable GPT in your reversing job with GDB.',
     )
+    parser.add_argument('--unit-test',help='Test if AutoGDB is installed successfully', action='store_true')
     parser.add_argument('--serverless',help='Run AutoGDB without bulit-in server',dest='serverless', action='store_true')
     parser.add_argument('--clue',help='Possible provided clues or helpful description of this challenge?', dest='clue')
     parser.add_argument('--clean-history',help='Clear previous commandline history of AutoGDB.', action='store_true')
@@ -143,6 +144,16 @@ def await_until_connection(autogdb: AutoGDB):
             time.sleep(5)
             progress.update(task, advance=0.1)
 
+def unit_test():
+    ip                                          = 'localhost'
+    port                                        = 5000
+    autogdb_server                              = AutoGDBServer(ip,port,logger=lo)
+
+    autogdb_server.start_uvicorn()
+    time.sleep(5)
+    autogdb_server.exit()
+
+
 def setup(args):
 
     USER_OPENAI_API_KEY, USER_OPENAI_API_BASE   = check_for_keys()
@@ -153,12 +164,15 @@ def setup(args):
     autogdb                                     = AutoGDB(server=ip, port=port)
     autogdb_server                              = AutoGDBServer(ip,port,logger=lo)
 
-
     history_manager.load_history()
     if args.clean_history:
         history_manager.clear_history()
         lo.info("History cleaned!\n")
         exit()
+
+    if args.unit_test:
+        unit_test()
+        exit(0)
 
     if args.serverless:
         name=''

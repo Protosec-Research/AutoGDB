@@ -16,7 +16,7 @@ import os
 OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", default="https://api.openai.com/v1")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
-    raise Exception("Please create an api_key.py file with your personal OPENAI_API_KEY and OPENAI_API_BASE variables or set the environment variables."):
+    raise Exception("Please create an api_key.py file with your personal OPENAI_API_KEY and OPENAI_API_BASE variables or set the environment variables.")
 
 # Main execution point of the script.
 if __name__ == "__main__":

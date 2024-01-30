@@ -1,0 +1,25 @@
+name: AutoGDB Installation
+on: [push]
+
+jobs:
+  install-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Clone and Install AutoGDB
+      run: |
+        git clone https://github.com/retr0reg/AutoGDB.git
+        cd AutoGDB
+        python3 -m pip install -r requirements.txt
+
+    - name: Run chat.py
+      run: |
+        python3 chat.py --unit-test
