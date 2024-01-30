@@ -151,8 +151,6 @@ def unit_test():
     autogdb_server                              = AutoGDBServer(ip,port,logger=lo)
 
     autogdb_server.start_uvicorn()
-    time.sleep(5)
-    autogdb_server.exit()
 
 
 def setup(args):
