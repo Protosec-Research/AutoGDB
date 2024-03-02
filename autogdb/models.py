@@ -19,22 +19,42 @@ import base64
 
 import readline
 class CliHistory:
-    def __init__(self,
-                 history_file = ".autogdb.history"
-                 ) -> None:
+    """
+    A class representing the command line interface (CLI) history.
+
+    Attributes:
+        history_file (str): The file path to save the CLI history.
+
+    Methods:
+        save_history: Saves the CLI history to the specified file.
+        load_history: Loads the CLI history from the specified file.
+        clear_history: Clears the CLI history.
+    """
+
+    def __init__(self, history_file=".autogdb.history") -> None:
         self.history_file = history_file
 
     def save_history(self):
+        """
+        Saves the CLI history to the specified file.
+        """
         readline.write_history_file(self.history_file)
 
     def load_history(self):
+        """
+        Loads the CLI history from the specified file.
+        """
         try:
             readline.read_history_file(self.history_file)
         except FileNotFoundError:
             pass
     
     def clear_history(self):
+        """
+        Clears the CLI history.
+        """
         readline.clear_history()
+        
 
 class ExploitGenerater:
     def __init__(self, filepath='./exp.py') -> None:
@@ -145,14 +165,41 @@ class AutoGDB:
     )
 
 class PwnAgent:
-    
-    def __init__(self,api_key: str,
-                api_base: str, 
-                autogdb: Tool,
-                binary_name='Unknown',
-                binary_path='Unknown',
-                clue=''
-            ) -> None:
+    """
+    A class representing a PwnAgent, which is a reverse-engineering helper for gdb.
+
+    Attributes:
+        api_key (str): The API key for ChatOpenAI.
+        api_base (str): The base URL for ChatOpenAI.
+        autogdb (Tool): An instance of the Tool class.
+        binary_name (str): The name of the binary file.
+        binary_path (str): The path to the binary file.
+        clue (str): Clues or helpful description for the project.
+
+    Methods:
+        __init__(self, api_key, api_base, autogdb, binary_name='Unknown', binary_path='Unknown', clue='')
+            Initializes a new instance of the PwnAgent class.
+        chat(self, input)
+            Runs the PwnAgent with the given input.
+
+    """
+
+    def __init__(self, api_key: str, api_base: str, autogdb: Tool, binary_name='Unknown', binary_path='Unknown', clue='') -> None:
+        """
+        Initializes a new instance of the PwnAgent class.
+
+        Args:
+            api_key (str): The API key for ChatOpenAI.
+            api_base (str): The base URL for ChatOpenAI.
+            autogdb (Tool): An instance of the Tool class.
+            binary_name (str, optional): The name of the binary file. Defaults to 'Unknown'.
+            binary_path (str, optional): The path to the binary file. Defaults to 'Unknown'.
+            clue (str, optional): Clues or helpful description for the project. Defaults to ''.
+
+        Returns:
+            None
+
+        """
         
         self.autogdb = autogdb
         self.llm = ChatOpenAI(temperature=0.5,
@@ -168,24 +215,6 @@ class PwnAgent:
 
         if self.clue: self.clue = "Clues or helpful-description on this project: " + self.clue
 
-        # THIS TEMPLATE HAS ISSUES IN REACT, THUS DISABLE UNTILL REASON FIND OUT
-        # self.template = f"""\
-        #     You are a serious reverse-engineering helper who don't make reckless decision. You can use gdb\
-        #     A list of valid pwndbg commands: \n
-        #     Current File name: {self.binary_name}, Path: {self.binary_path}
-        #     {self.clue}
-        #     {pwndbg.base_prompt()} \n
-        #     * Process-based analysis and dynamic analysis is recommanded.\
-        #     * disassemble main are recommand starter for analysing\
-        #     * The program is already running\
-        #     * Keep using gdb if you want until you solve the problem throughly \
-        #     * when dealing with CTF challenges, remember they are ctf-challenges\
-        #     * When you use command \'run\', the user will help you Ctrl+C the program manuly.\
-        #     * When finding a ideal exploitation, make sure that the payload you provide leads to environmental interact or the flag, for example: b'a'*x+p64(<the_actual_address_of_magic>) is accepted\
-        #     * When analysing the offset of stack overflows, pay attention to actual position of the variable on the stack\
-        #     * When reporting a vulnerabilty, make sure to notice where the trigger, how can it be triggered?\
-        #     """ 
-        
         self.template = f"""\
             You are a serious reverse-engineering helper who don't make reckless decision. You can use gdb\
             Current File name: {binary_name}, Path: {binary_path}
@@ -218,11 +247,39 @@ class PwnAgent:
             }
         )
 
-    def chat(self,input):
+    def chat(self, input):
+        """
+        Runs the PwnAgent with the given input.
+
+        Args:
+            input (str): The input for the PwnAgent.
+
+        Returns:
+            str: The response from the PwnAgent.
+
+        """
         return self.agent.run(self.template+input)
 
     
 class ChatAgent:
+    """
+    A class representing a chat agent that interacts with users and performs tasks using various tools.
+
+    Args:
+        api_key (str): The API key for the OpenAI service.
+        api_base (str): The base URL for the OpenAI service.
+        pwnagent (PwnAgent): An instance of the PwnAgent class.
+
+    Attributes:
+        expgenerater (ExploitGenerater): An instance of the ExploitGenerater class.
+        memory (ConversationBufferMemory): An instance of the ConversationBufferMemory class.
+        llm (ChatOpenAI): An instance of the ChatOpenAI class for interacting with the OpenAI chat model.
+        tool (Tool): An instance of the Tool class representing the GDB Agent tool.
+        template (str): A template string containing information about the GDB Agent and its capabilities.
+        sysmessage (SystemMessage): An instance of the SystemMessage class representing a system message.
+        chat_conversation_agent (Agent): An instance of the Agent class for running chat conversations.
+
+    """
 
     def __init__(self, api_key: str, api_base: str, pwnagent: PwnAgent) -> None:
         from langchain.agents import Tool
@@ -274,5 +331,15 @@ class ChatAgent:
             }
         )
 
-    def chat_and_assign(self,input):
+    def chat_and_assign(self, input):
+        """
+        Run a chat conversation with the user and assign the task to the appropriate tool.
+
+        Args:
+            input (str): The user's input.
+
+        Returns:
+            str: The response from the chat conversation agent.
+
+        """
         return self.chat_conversation_agent.run(input)

@@ -194,6 +194,7 @@ def setup(args):
     return chatagent, autogdb_server, history_manager
 
 def main(chatagent, history_manager):
+    
     text_query = console_input(f"\n  [bold light_steel_blue1] Talk to [/bold light_steel_blue1][bold plum2]GDBAgent[/bold plum2]",pure_input=False)
     print(f"  [bold medium_purple1]:snowboarder: GDBAgent[/bold medium_purple1]: ", end='')
 
