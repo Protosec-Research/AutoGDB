@@ -22,6 +22,7 @@ If you are new to AutoGDB, clone our project first!
 ```shell
 git clone https://github.com/retr0reg/AutoGDB.git && cd AutoGDB
 chmod +x ./install.sh && ./install.sh
+python3 -m pip install -r requirements.txt
 ``` 
 `install.sh` will add `plugin/gpt.py` in to your `~/.gdbinit` as a gdb plugin; Or you can do it by editing `~/.gdbinit` manually;
 
