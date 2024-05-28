@@ -7,3 +7,4 @@ rich==13.7.0
 uvicorn==0.25.0
 jinja2
 python-dotenv==1.0.0
+openai
